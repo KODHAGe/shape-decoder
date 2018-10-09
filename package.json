@@ -3,6 +3,7 @@
     "start": "micro"
   },
   "dependencies": {
-    "micro": "latest"
+    "micro": "latest",
+    "watson-developer-cloud": "^3.11.1"
   }
 }
