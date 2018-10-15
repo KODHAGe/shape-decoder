@@ -5,30 +5,90 @@ const naturalLanguageUnderstanding = new NaturalLanguageUnderstandingV1({
   url: process.env.WATSON_NLU_URL
 })
 
-var textInput = 'Ahoy, world!'
-
-var parameters = {
-  'text': textInput,
-  'features': {
-    'entities': {
-      'emotion': true,
-      'sentiment': true,
-      'limit': 2
-    },
-    'keywords': {
-      'emotion': true,
-      'sentiment': true,
-      'limit': 2
+function entityParams (text) {
+  if (text) {
+    return {
+      'text': text,
+      'features': {
+        'entities': {
+          'emotion': true,
+          'sentiment': true,
+          'limit': 3
+        }
+      }
     }
+  } else {
+    console.log('ERROR: No text input.')
+    return false
   }
 }
 
-naturalLanguageUnderstanding.analyze(parameters, function (err, response) {
-  if (err) {
-    console.log('error:', err)
+function keywordParams (text) {
+  if (text) {
+    return {
+      'text': text,
+      'features': {
+        'keywords': {
+          'emotion': true,
+          'sentiment': true,
+          'limit': 3
+        }
+      }
+    }
   } else {
-    console.log(JSON.stringify(response, null, 2))
+    console.log('ERROR: No text input.')
+    return false
   }
-})
+}
 
-module.exports = () => ''
+function allParams (text) {
+  if (text) {
+    return {
+      'text': text,
+      'features': {
+        'entities': {
+          'emotion': true,
+          'sentiment': true,
+          'limit': 3
+        },
+        'keywords': {
+          'emotion': true,
+          'sentiment': true,
+          'limit': 3
+        }
+      }
+    }
+  } else {
+    console.log('ERROR: No text input.')
+    return false
+  }
+}
+
+function getAnalysis (params, text) {
+  let parameters = params(text)
+  naturalLanguageUnderstanding.analyze(parameters, function (err, response) {
+    if (err) {
+      console.log('error:', err)
+    } else {
+      console.log(JSON.stringify(response, null, 2))
+    }
+  })
+}
+
+function all (text) {
+  getAnalysis(allParams, text)
+}
+
+function keywords (text) {
+  getAnalysis(keywordParams, text)
+}
+
+function entities (text) {
+  getAnalysis(entityParams, text)
+}
+
+module.exports = {
+  all: all,
+  keywords: keywords,
+  entities: entities
+}

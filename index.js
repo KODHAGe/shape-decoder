@@ -1,25 +1,27 @@
 require('dotenv').config()
 
-/* ═════════════════
-  Text analytics 
-═════════════════ */
+/* ══════════════════════════════════
+    Text analysis
+══════════════════════════════════ */
 
 /* ------- IBM Watson APIs ------- */
 
 // Tone Analyzer
-//require('./watson/toneAnalyser.js')
+// let wta = require('./watson/toneAnalyser.js')
+// wta.all('Ahoy, world!')
 
 // Natural Language Understanding
-//require('./watson/naturalLanguageUnderstanding.js')
+// let wlu = require('./watson/naturalLanguageUnderstanding.js')
+// wlu.all('Ahoy, world!')
 
 /* ------- Google Cloud APIs ------- */
 
 // Cloud Natural Language
-let gnl = require('./google/naturalLanguage.js')
-gnl.all('Ahoy, world!')
+// let gnl = require('./google/naturalLanguage.js')
+// gnl.all('Ahoy, world!')
 
 /* ------- Microsoft Azure APIs ------- */
 
 // Text Analytics
-//let ata = require('./azure/textAnalytics.js')
-//ata.all()
+// let ata = require('./azure/textAnalytics.js')
+// ata.all('Ahoy, world!')

@@ -6,19 +6,34 @@ const toneAnalyser = new ToneAnalyzerV3({
   url: process.env.WATSON_TONE_URL
 })
 
-var textInput = 'Ahoy, world!'
-
-var toneParams = {
-  'tone_input': { 'text': textInput },
-  'content_type': 'application/json'
+function createParams (text) {
+  if (text) {
+    return {
+      'tone_input': { 'text': text },
+      'content_type': 'application/json'
+    }
+  } else {
+    console.log('ERROR: No text input.')
+    return false
+  }
 }
 
-toneAnalyser.tone(toneParams, function (error, toneAnalysis) {
-  if (error) {
-    console.log(error)
-  } else {
-    console.log(JSON.stringify(toneAnalysis, null, 2))
-  }
-})
+function tone (text) {
+  let toneParams = createParams(text)
+  toneAnalyser.tone(toneParams, function (error, toneAnalysis) {
+    if (error) {
+      console.log(error)
+    } else {
+      console.log(JSON.stringify(toneAnalysis, null, 2))
+    }
+  })
+}
 
-module.exports = () => ''
+function all (text) {
+  tone(text)
+}
+
+module.exports = {
+  all: all,
+  tone: tone
+}

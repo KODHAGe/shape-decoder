@@ -1,5 +1,3 @@
-const async = require('async')
-
 const Language = require('azure-cognitiveservices-language')
 const CognitiveServicesCredentials = require('ms-rest-azure').CognitiveServicesCredentials
 const key = process.env.AZURE_TEXT_ANALYTICS_KEY_1
@@ -61,18 +59,10 @@ async function sentiment (text) {
   }
 }
 
-function all () {
-  async.series([
-    keyphrases,
-    sentiment,
-    function () {
-      return new Promise((resolve) => {
-        resolve()
-      })
-    }
-  ], (err) => {
-    throw (err)
-  })
+function all (text) {
+  console.log('Running all Azure Text analytics')
+  keyphrases(text)
+  sentiment(text)
 }
 
 module.exports = {
