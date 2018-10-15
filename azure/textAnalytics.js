@@ -1,3 +1,5 @@
+// WORKS BUT NEEDS PROMISIFYING
+
 const Language = require('azure-cognitiveservices-language')
 const CognitiveServicesCredentials = require('ms-rest-azure').CognitiveServicesCredentials
 const key = process.env.AZURE_TEXT_ANALYTICS_KEY_1
@@ -34,6 +36,7 @@ async function keyphrases (text) {
       for (let j = 0; j < document.keyPhrases.length; j++) {
         console.log(`\t\t${document.keyPhrases[j]}`)
       }
+      return result
     }
   } else {
     console.log('No results data.')
@@ -48,18 +51,18 @@ async function sentiment (text) {
       document
     ]
   })
-
   if (result.documents.length > 0) {
     for (let i = 0; i < result.documents.length; i++) {
       let document = result.documents[i]
       console.log(`Document ID: ${document.id} , Sentiment Score: ${document.score}`)
     }
+    return result
   } else {
     console.log('No results data.')
   }
 }
 
-function all (text) {
+async function all (text) {
   console.log('Running all Azure Text analytics')
   keyphrases(text)
   sentiment(text)

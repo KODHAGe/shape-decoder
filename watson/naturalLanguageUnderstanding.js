@@ -65,26 +65,36 @@ function allParams (text) {
 }
 
 function getAnalysis (params, text) {
-  let parameters = params(text)
-  naturalLanguageUnderstanding.analyze(parameters, function (err, response) {
-    if (err) {
-      console.log('error:', err)
-    } else {
-      console.log(JSON.stringify(response, null, 2))
-    }
+  return new Promise((resolve, reject) => {
+    let parameters = params(text)
+    naturalLanguageUnderstanding.analyze(parameters, function (err, response) {
+      if (err) {
+        console.log('error:', err)
+        reject(err)
+      } else {
+        console.log(JSON.stringify(response, null, 2))
+        resolve(JSON.stringify(response, null, 2))
+      }
+    })
   })
 }
 
 function all (text) {
-  getAnalysis(allParams, text)
+  return new Promise((resolve, reject) => {
+    resolve(getAnalysis(allParams, text))
+  })
 }
 
 function keywords (text) {
-  getAnalysis(keywordParams, text)
+  return new Promise((resolve, reject) => {
+    getAnalysis(keywordParams, text)
+  })
 }
 
 function entities (text) {
-  getAnalysis(entityParams, text)
+  return new Promise((resolve, reject) => {
+    getAnalysis(entityParams, text)
+  })
 }
 
 module.exports = {
