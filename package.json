@@ -3,7 +3,14 @@
     "start": "micro"
   },
   "dependencies": {
+    "@google-cloud/language": "^2.0.0",
+    "async": "^2.6.1",
+    "axios": "^0.18.0",
+    "azure-cognitiveservices-language": "^1.0.0-preview",
+    "dotenv": "^6.1.0",
     "micro": "latest",
-    "watson-developer-cloud": "^3.11.1"
+    "ms-rest-azure": "^2.5.9",
+    "standard": "^12.0.1",
+    "watson-developer-cloud": "^3.12.0"
   }
 }
