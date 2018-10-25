@@ -1,4 +1,3 @@
-// WORKS BUT NEEDS PROMISIFYING
 const language = require('@google-cloud/language')
 
 const client = new language.LanguageServiceClient()
@@ -15,62 +14,44 @@ function createDocument (text) {
   }
 }
 
-function sentiment (text) {
+async function sentiment (text) {
   let document = createDocument(text)
-  client.analyzeSentiment({ document: document })
-    .then(results => {
-      const sentiment = results[0].documentSentiment
-      console.log(`Text: ${text}`)
-      console.log(`Sentiment score: ${sentiment.score}`)
-      console.log(`Sentiment magnitude: ${sentiment.magnitude}`)
-      return sentiment
-    })
-    .catch(err => {
-      console.error('ERROR:', err)
-    })
+  try {
+    let response = await client.analyzeSentiment({ document: document })
+    return response
+  } catch (error) {
+    console.log(error)
+  }
 }
 
-function syntax (text) {
+async function syntax (text) {
   let document = createDocument(text)
-  client.analyzeSyntax({ document: document })
-    .then(results => {
-      const syntax = results[0]
-      console.log('Parts of speech:')
-      syntax.tokens.forEach(part => {
-        console.log(`${part.partOfSpeech.tag}: ${part.text.content}`)
-        console.log(`Morphology:`, part.partOfSpeech)
-      })
-      return syntax
-    })
-    .catch(err => {
-      console.error('ERROR:', err)
-    })
+  try {
+    let response = await client.analyzeSyntax({ document: document })
+    return response
+  } catch (error) {
+    console.log(error)
+  }
 }
 
-function entitySentiment (text) {
+async function entitySentiment (text) {
   let document = createDocument(text)
-  client.analyzeEntitySentiment({ document: document })
-    .then(results => {
-      const entities = results[0].entities
-
-      console.log(`Entities and sentiments:`)
-      entities.forEach(entity => {
-        console.log(`  Name: ${entity.name}`)
-        console.log(`  Type: ${entity.type}`)
-        console.log(`  Score: ${entity.sentiment.score}`)
-        console.log(`  Magnitude: ${entity.sentiment.magnitude}`)
-      })
-    })
-    .catch(err => {
-      console.error('ERROR:', err)
-    })
+  try {
+    let response = await client.analyzeEntitySentiment({ document: document })
+    return response
+  } catch (error) {
+    console.log(error)
+  }
 }
 
-function all (text) {
+async function all (text) {
   console.log('Running all Google Cloud NL analyses')
-  sentiment(text)
-  syntax(text)
-  entitySentiment(text)
+  let all = {
+    sentiment: await sentiment(text),
+    syntax: await syntax(text),
+    entitySentiment: await entitySentiment(text)
+  }
+  return all
 }
 
 module.exports = {

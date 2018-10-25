@@ -27,7 +27,6 @@ async function keyphrases (text) {
       document
     ]
   })
-
   if (result.documents.length > 0) {
     for (let i = 0; i < result.documents.length; i++) {
       let document = result.documents[i]
@@ -64,8 +63,11 @@ async function sentiment (text) {
 
 async function all (text) {
   console.log('Running all Azure Text analytics')
-  keyphrases(text)
-  sentiment(text)
+  let all = {
+    keyphrases: await keyphrases(text),
+    sentiment: await sentiment(text)
+  }
+  return all
 }
 
 module.exports = {
