@@ -30,7 +30,6 @@ let naturalLanguageUnderstandingResponse = async (req, res) => {
 const gnl = require('./google/naturalLanguage.js')
 let naturalLanguageResponse = async (req, res) => {
   let text = req.params.text.replace(/\+/g, ' ')
-  console.log(text)
   let response = await gnl.all(text)
   send(res, 200, response)
 }
@@ -41,7 +40,6 @@ let naturalLanguageResponse = async (req, res) => {
 const ata = require('./azure/textAnalytics.js')
 let textAnalyticsResponse = async (req, res) => {
   let text = req.params.text.replace(/\+/g, ' ')
-  console.log(text)
   let response = await ata.all(text)
   send(res, 200, response)
 }
@@ -54,13 +52,14 @@ let allTextEmotionResponses = async (req, res) => {
   const text = body.text
 
   let wtaResponse = await wta.all(text)
-  let wnluResponse = await wnlu.all(text)
+  // let wnluResponse = await wnlu.all(text)
   let gnlResponse = await gnl.all(text)
   let ataResponse = await ata.all(text)
 
   let allResponses = {
+    'text': text,
     'wta': JSON.parse(wtaResponse),
-    'wnlu': JSON.parse(wnluResponse),
+    // 'wnlu': JSON.parse(wnluResponse),
     'gnl': gnlResponse,
     'ata': ataResponse
   }
@@ -70,11 +69,15 @@ let allTextEmotionResponses = async (req, res) => {
 // Parses responses from different sources to a neat singular response object
 // This will contain application specific logic
 let parseResponses = (responsesObject) => {
+  let text = responsesObject.text
   let detectedEmotions = responsesObject.wta.document_tone.tones
   let sentiment = responsesObject.ata.sentiment.documents[0].score
+  let entities = responsesObject.gnl.entitySentiment[0].entities
   let response = {
+    text,
     detectedEmotions,
-    sentiment
+    sentiment,
+    entities
   }
   return response
 }
@@ -87,6 +90,7 @@ let analyseTextRaw = async (req, res) => {
 
 // Sends parsed & processed text analysis JSON
 let analyseTextParsed = async (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', '*')
   let raw = await allTextEmotionResponses(req, res)
   let parsed = parseResponses(raw)
   send(res, 200, parsed)
