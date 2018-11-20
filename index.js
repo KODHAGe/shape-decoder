@@ -4,17 +4,20 @@ const { router, get, post } = require('microrouter')
 const jwt = require('jwt-simple')
 const secret = process.env.JWT_SECRET
 
-const authenticate = async (req, res) => {
+const authenticate = async (req, res, callback) => {
+  console.log(callback)
   let body = await json(req)
   let token = body.jwt
   try {
     let decoded = jwt.decode(token, secret)
     if (decoded) {
+      res.setHeader('Access-Control-Allow-Origin', '*')
       // Add specific authentication scope handling here
-      return true
+      return callback(req, res)
     }
   } catch (err) {
     send(res, 401, 'Authentication failed: ' + err.message)
+    return false
   }
 }
 
@@ -27,21 +30,23 @@ const authenticate = async (req, res) => {
 // Tone Analyzer
 const wta = require('./watson/toneAnalyzer.js')
 let toneAnalyzerResponse = async (req, res) => {
-  await authenticate(req, res)
-  const body = await json(req)
-  const text = body.text
-  let response = await wta.all(text)
-  send(res, 200, response)
+  await authenticate(req, res, async () => {
+    const body = await json(req)
+    const text = body.text
+    let response = await wta.all(text)
+    return send(res, 200, response)
+  })
 }
 
 // Natural Language Understanding
 const wnlu = require('./watson/naturalLanguageUnderstanding.js')
 let naturalLanguageUnderstandingResponse = async (req, res) => {
-  await authenticate(req, res)
-  const body = await json(req)
-  const text = body.text
-  let response = await wnlu.all(text)
-  send(res, 200, response)
+  await authenticate(req, res, async () => {
+    const body = await json(req)
+    const text = body.text
+    let response = await wnlu.all(text)
+    return send(res, 200, response)
+  })
 }
 
 /* ------- Google Cloud APIs ------- */
@@ -49,11 +54,12 @@ let naturalLanguageUnderstandingResponse = async (req, res) => {
 // Cloud Natural Language
 const gnl = require('./google/naturalLanguage.js')
 let naturalLanguageResponse = async (req, res) => {
-  await authenticate(req, res)
-  const body = await json(req)
-  const text = body.text
-  let response = await gnl.all(text)
-  send(res, 200, response)
+  await authenticate(req, res, async () => {
+    const body = await json(req)
+    const text = body.text
+    let response = await gnl.all(text)
+    return send(res, 200, response)
+  })
 }
 
 /* ------- Microsoft Azure APIs ------- */
@@ -61,18 +67,18 @@ let naturalLanguageResponse = async (req, res) => {
 // Text Analytics
 const ata = require('./azure/textAnalytics.js')
 let textAnalyticsResponse = async (req, res) => {
-  await authenticate(req, res)
-  const body = await json(req)
-  const text = body.text
-  let response = await ata.all(text)
-  send(res, 200, response)
+  await authenticate(req, res, async () => {
+    const body = await json(req)
+    const text = body.text
+    let response = await ata.all(text)
+    return send(res, 200, response)
+  })
 }
 
 /* ------- Combo ------- */
 
 // Returns combined set of emotions, sentiments & entities found in entered document
 let allTextEmotionResponses = async (req, res) => {
-  await authenticate(req, res)
   const body = await json(req)
   const text = body.text
 
@@ -109,18 +115,19 @@ let parseResponses = (responsesObject) => {
 
 // Sends full raw text analysis JSON
 let analyseTextRaw = async (req, res) => {
-  await authenticate(req, res)
-  let raw = await allTextEmotionResponses(req, res)
-  send(res, 200, raw)
+  await authenticate(req, res, async () => {
+    let raw = await allTextEmotionResponses(req, res)
+    return send(res, 200, raw)
+  })
 }
 
 // Sends parsed & processed text analysis JSON
 let analyseTextParsed = async (req, res) => {
-  await authenticate(req, res)
-  res.setHeader('Access-Control-Allow-Origin', '*')
-  let raw = await allTextEmotionResponses(req, res)
-  let parsed = parseResponses(raw)
-  send(res, 200, parsed)
+  await authenticate(req, res, async () => {
+    let raw = await allTextEmotionResponses(req, res)
+    let parsed = parseResponses(raw)
+    return send(res, 200, parsed)
+  })
 }
 
 // Manage routes with micro-router❤️

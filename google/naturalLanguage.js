@@ -1,6 +1,11 @@
 const language = require('@google-cloud/language')
 
-const client = new language.LanguageServiceClient()
+let b64string = process.env.GOOGLE_APPLICATION_CREDENTIALS
+let credentials = Buffer.from(b64string, 'base64').toString('utf8')
+
+const client = new language.LanguageServiceClient({
+  'credentials': JSON.parse(credentials)
+})
 
 function createDocument (text) {
   if (text) {

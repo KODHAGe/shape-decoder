@@ -1,0 +1,14 @@
+{
+  "version" : 1,
+  "env": {
+    "WATSON_NLU_API_KEY": "@watson-nlu-api-key",
+    "WATSON_NLU_URL": "@watson-nlu-url",
+    "WATSON_TONE_API_KEY": "@watson-tone-api",
+    "WATSON_TONE_URL": "@watson-tone-url",
+    "GOOGLE_APPLICATION_CREDENTIALS": "@google-s-a",
+    "AZURE_TEXT_ANALYTICS_KEY_1": "@azure-ta-1",
+    "AZURE_TEXT_ANALYTICS_KEY_2": "@azure-ta-2",
+    "AZURE_URL": "@azure-url",
+    "JWT_SECRET": "@jwt-secret"
+  }
+}
