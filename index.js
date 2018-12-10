@@ -1,11 +1,10 @@
 require('dotenv').config()
 const { send, json } = require('micro')
-const { router, get, post } = require('microrouter')
+const { router, get, post, options } = require('microrouter')
 const jwt = require('jwt-simple')
 const secret = process.env.JWT_SECRET
 
 const authenticate = async (req, res, callback) => {
-  console.log(callback)
   let body = await json(req)
   let token = body.jwt
   try {
@@ -31,8 +30,8 @@ const authenticate = async (req, res, callback) => {
 const wta = require('./watson/toneAnalyzer.js')
 let toneAnalyzerResponse = async (req, res) => {
   await authenticate(req, res, async () => {
-    const body = await json(req)
-    const text = body.text
+    let body = await json(req)
+    let text = body.text
     let response = await wta.all(text)
     return send(res, 200, response)
   })
@@ -42,8 +41,8 @@ let toneAnalyzerResponse = async (req, res) => {
 const wnlu = require('./watson/naturalLanguageUnderstanding.js')
 let naturalLanguageUnderstandingResponse = async (req, res) => {
   await authenticate(req, res, async () => {
-    const body = await json(req)
-    const text = body.text
+    let body = await json(req)
+    let text = body.text
     let response = await wnlu.all(text)
     return send(res, 200, response)
   })
@@ -54,9 +53,10 @@ let naturalLanguageUnderstandingResponse = async (req, res) => {
 // Cloud Natural Language
 const gnl = require('./google/naturalLanguage.js')
 let naturalLanguageResponse = async (req, res) => {
+  console.log(1)
   await authenticate(req, res, async () => {
-    const body = await json(req)
-    const text = body.text
+    let body = await json(req)
+    let text = body.text
     let response = await gnl.all(text)
     return send(res, 200, response)
   })
@@ -68,8 +68,8 @@ let naturalLanguageResponse = async (req, res) => {
 const ata = require('./azure/textAnalytics.js')
 let textAnalyticsResponse = async (req, res) => {
   await authenticate(req, res, async () => {
-    const body = await json(req)
-    const text = body.text
+    let body = await json(req)
+    let text = body.text
     let response = await ata.all(text)
     return send(res, 200, response)
   })
@@ -79,8 +79,8 @@ let textAnalyticsResponse = async (req, res) => {
 
 // Returns combined set of emotions, sentiments & entities found in entered document
 let allTextEmotionResponses = async (req, res) => {
-  const body = await json(req)
-  const text = body.text
+  let body = await json(req)
+  let text = body.text
 
   let wtaResponse = await wta.all(text)
   // let wnluResponse = await wnlu.all(text)
@@ -130,15 +130,25 @@ let analyseTextParsed = async (req, res) => {
   })
 }
 
+async function handlePreflight (req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*')
+  res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
+  res.setHeader('Access-Control-Allow-Credentials', false)
+  res.setHeader('Access-Control-Max-Age', '86400')
+  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept')
+  send(res, 200)
+}
+
 // Manage routes with micro-router❤️
 const routes = router(
   get('/', (req, res) => {
     send(res, 200, 'shape-decoder api v1')
   }),
-  post('/watson/toneAnalyzer/', toneAnalyzerResponse),
-  post('/watson/naturalLanguageUnderstanding/', naturalLanguageUnderstandingResponse),
-  post('/google/naturalLanguage/', naturalLanguageResponse),
-  post('/azure/textAnalytics/', textAnalyticsResponse),
+  options('*', handlePreflight),
+  post('/watson/toneAnalyzer', toneAnalyzerResponse),
+  post('/watson/naturalLanguageUnderstanding', naturalLanguageUnderstandingResponse),
+  post('/google/naturalLanguage', naturalLanguageResponse),
+  post('/azure/textAnalytics', textAnalyticsResponse),
   post('/analyse-text-raw', analyseTextRaw),
   post('/analyse-text', analyseTextParsed)
 )

@@ -1,4 +1,6 @@
 {
+  "name": "shape-decoder",
+  "alias": "shape-decoder",
   "version" : 1,
   "env": {
     "WATSON_NLU_API_KEY": "@watson-nlu-api-key",
